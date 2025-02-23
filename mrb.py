@@ -17,7 +17,7 @@ def chek(url):
             print("Request failed")
 
 def start_threads():
-    target_url = "https://gnral.vip-pro.site/"
+    target_url = "https://gnral.vip-pro.site:443"
     for _ in range(100):
         thread = threading.Thread(target=chek, args=(target_url,))
         thread.daemon = True  # يجعل الثريدات تتوقف عند إيقاف السيرفر
@@ -25,8 +25,8 @@ def start_threads():
 
 @app.route('/')
 def home():
-    return "Server is running with background threads!"
+    return "ultra bom bom"
 
 if __name__ == '__main__':
     threading.Thread(target=start_threads, daemon=True).start()
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=8080)
