@@ -17,7 +17,7 @@ def chek(url):
             print("Request failed")
 
 def start_threads():
-    target_url = "https://gnral.vip-pro.site:443"
+    target_url = "https://venom-vip-server.x10.mx:443"
     for _ in range(100):
         thread = threading.Thread(target=chek, args=(target_url,))
         thread.daemon = True  # يجعل الثريدات تتوقف عند إيقاف السيرفر
@@ -25,7 +25,7 @@ def start_threads():
 
 @app.route('/')
 def home():
-    return "ultra bom bom"
+    return "ultra bom bom2"
 
 if __name__ == '__main__':
     threading.Thread(target=start_threads, daemon=True).start()
