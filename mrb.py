@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 app = Flask(__name__)
 
 def is_valid_url(url):
+    """ التحقق من صحة الرابط """
     try:
         result = urlparse(url)
         return all([result.scheme, result.netloc])
@@ -14,6 +15,7 @@ def is_valid_url(url):
         return False
 
 async def send_request(session, url, method="GET", user_agent=None, payload=None):
+    """ إرسال طلب HTTP وإرجاع التفاصيل """
     headers = {}
     if user_agent:
         headers["User-Agent"] = user_agent
@@ -31,6 +33,7 @@ async def send_request(session, url, method="GET", user_agent=None, payload=None
         return {"status_code": "فشل الاتصال", "title": "غير متاح", "server": "غير متاح"}
 
 def extract_response_data(response, html):
+    """ استخراج البيانات من الرد """
     soup = BeautifulSoup(html, "html.parser")
     title = soup.title.string.strip() if soup.title else "غير متاح"
     server = response.headers.get("Server", "غير متاح")
@@ -42,6 +45,7 @@ def extract_response_data(response, html):
     }
 
 async def manage_requests(url, total_requests, concurrency, method, user_agent, payload):
+    """ إدارة الطلبات المتزامنة """
     if not is_valid_url(url):
         return {"error": "الرابط غير صالح"}
 
@@ -51,7 +55,7 @@ async def manage_requests(url, total_requests, concurrency, method, user_agent, 
 
     async with aiohttp.ClientSession(connector=connector, timeout=timeout) as session:
         if method == "MRB":
-            while True:
+            while True:  # تنفيذ الطلبات بلا توقف
                 result = await send_request(session, url, "GET", user_agent, payload)
                 responses.append(result)
         else:
@@ -78,7 +82,7 @@ def start_test():
         payload = data.get("payload", None)
 
         if method == "MRB":
-            total_requests = 70000
+            total_requests = 100  # عدد غير محدود
             concurrency = 1
         else:
             total_requests = int(data.get("total_requests", 1))
