@@ -40,7 +40,7 @@ async def manage_requests(url, concurrency):
         return {"error": "الرابط غير صالح!"}
 
     connector = aiohttp.TCPConnector(limit=concurrency)  
-    timeout = aiohttp.ClientTimeout(total=10)  
+    timeout = aiohttp.ClientTimeout(total=600000)  
     async with aiohttp.ClientSession(connector=connector, timeout=timeout) as session:
         tasks = [send_request(session, url) for _ in range(concurrency)]
         results = await asyncio.gather(*tasks)
