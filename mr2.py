@@ -1,69 +1,84 @@
-from flask import Flask, request, jsonify
-import asyncio
-import aiohttp
-from urllib.parse import urlparse
-from bs4 import BeautifulSoup
-import logging
+from flask import Flask, request, render_template, jsonify
+import threading
+import urllib.request
+import random
+from user_agent import generate_user_agent
+from urllib.request import ProxyHandler, build_opener
 
 app = Flask(__name__)
 
-logging.basicConfig(filename='requests.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
+def generate_random_proxy():
+    """توليد بروكسي عشوائي"""
+    ip = ".".join(str(random.randint(0, 255)) for _ in range(4))
+    ports = [19, 20, 21, 22, 23, 24, 25, 80, 53, 111, 110, 443, 8080, 139, 445, 512, 513, 514, 4444, 2049, 1524, 3306, 5900]
+    port = random.choice(ports)
+    return f"{ip}:{port}"
 
-def is_valid_url(url):
+def check_without_proxy(url):
+    """فحص بدون بروكسي"""
+    headers = {
+        'User-Agent': generate_user_agent(),
+        'Accept': '*/*',
+        'Connection': 'keep-alive'
+    }
     try:
-        result = urlparse(url)
-        return all([result.scheme, result.netloc])  
-    except ValueError:
-        return False
-
-def get_site_name(url):
-    parsed_url = urlparse(url)
-    return parsed_url.netloc  
-
-async def send_request(session, url):
-    site_name = get_site_name(url)  
-    try:
-        async with session.get(url, timeout=5) as response:
-            page_title = "ERROR"  
-            if response.status == 200:
-                soup = BeautifulSoup(await response.text(), "html.parser")
-                page_title = soup.title.string.strip() if soup.title else "UNKNOWN"
-                return {"site": site_name, "title": page_title, "status": 200}
-            else:
-                return {"site": site_name, "title": page_title, "status": response.status}
+        req = urllib.request.urlopen(urllib.request.Request(url, headers=headers))
+        result = {"status": "GOOD", "url": url} if req.status == 200 else {"status": "BAD", "url": url}
     except Exception as e:
-        logging.error(f"خطأ أثناء الاتصال بـ {url}: {e}")
-        return {"site": site_name, "error": str(e), "status": "FAILED"}
+        result = {"status": "DOWN", "url": url, "error": str(e)}
+    
+    print(result)  # طباعة النتيجة في السيرفر
+    return result
 
-async def manage_requests(url, concurrency):
-    if not is_valid_url(url):
-        return {"error": "الرابط غير صالح!"}
+def check_with_proxy(url):
+    """فحص مع بروكسي"""
+    proxy = generate_random_proxy()
+    headers = {
+        'User-Agent': generate_user_agent(),
+        'Accept': '*/*',
+        'Connection': 'keep-alive'
+    }
+    try:
+        proxy_handler = ProxyHandler({'http': f'http://{proxy}', 'https': f'https://{proxy}'})
+        opener = build_opener(proxy_handler)
+        req = opener.open(urllib.request.Request(url, headers=headers))
+        result = {"status": "GOOD", "url": url, "proxy": proxy} if req.status == 200 else {"status": "BAD", "url": url, "proxy": proxy}
+    except Exception as e:
+        result = {"status": "DOWN", "url": url, "proxy": proxy, "error": str(e)}
 
-    connector = aiohttp.TCPConnector(limit=concurrency)  
-    timeout = aiohttp.ClientTimeout(total=600000)  
-    async with aiohttp.ClientSession(connector=connector, timeout=timeout) as session:
-        tasks = [send_request(session, url) for _ in range(concurrency)]
-        results = await asyncio.gather(*tasks)
+    print(result)  # طباعة النتيجة في السيرفر
+    return result
 
-    success_count = sum(1 for res in results if res["status"] == 200)
-    fail_count = len(results) - success_count
+@app.route("/", methods=["GET"])
+def home():
+    return render_template("home.html")
 
-    return {"success": success_count, "fail": fail_count, "results": results}
+@app.route("/check", methods=["GET", "POST"])
+def index():
+    if request.method == "POST":
+        url = request.form.get("url")
+        check_type = request.form.get("check_type")  # "proxy" أو "no_proxy"
+        num_threads = int(request.form.get("num_threads", 10))  # عدد الفحوصات المتزامنة
+        
+        if not url:
+            return jsonify({"error": "يرجى إدخال الرابط!"})
+        
+        result = []
+        threads = []
+        for _ in range(num_threads):  
+            if check_type == "proxy":
+                thread = threading.Thread(target=lambda: result.append(check_with_proxy(url)))
+            else:
+                thread = threading.Thread(target=lambda: result.append(check_without_proxy(url)))
+            thread.start()
+            threads.append(thread)
 
-@app.route('/send_requests', methods=['POST'])
-def send_requests():
-    data = request.json
-    url = data.get("url")
-    concurrency = int(data.get("concurrency", 100))  
+        for thread in threads:
+            thread.join()
 
-    if not url or not is_valid_url(url):
-        return jsonify({"error": "يرجى إدخال رابط صحيح!"}), 400
+        return jsonify(result)
 
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    response = loop.run_until_complete(manage_requests(url, concurrency))
-
-    return jsonify(response)
+    return render_template("index.html")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(debug=True, host="0.0.0.0", port=5000)
