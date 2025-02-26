@@ -2,3 +2,4 @@ bs4
 requests
 Flask
 aiohttp
+user_agent
