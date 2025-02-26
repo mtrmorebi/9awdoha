@@ -3,146 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اختبار الضغط على الموقع</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
+    <title>DDoS panel - dashboard</title>
     <style>
         body {
-            background-color: #121F3D; /* أزرق داكن */
-            color: #fff;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #1e1e2e, #2a2a3b);
+            color: white;
+            text-align: center;
+            padding: 20px;
         }
         .container {
+            width: 90%;
             max-width: 600px;
-            margin-top: 50px;
+            margin: auto;
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.2);
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+        }
+        input, select {
+            background-color: #333;
+            color: white;
+        }
+        .button {
+            background-color: #f39c12;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .button:hover {
+            background-color: #e67e22;
         }
         .result-box {
+            background-color: #333;
             padding: 15px;
-            background: #1E2A47;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            margin-top: 20px;
+            border-radius: 10px;
+            text-align: left;
         }
-        .response-list {
-            max-height: 300px;
-            overflow-y: auto;
+        .stats {
+            margin-top: 20px;
+            font-size: 18px;
+            text-align: left;
+            background: #444;
+            padding: 10px;
+            border-radius: 5px;
         }
-        label {
-            font-weight: bold;
-            color: #f8f9fa;
-        }
-        .form-control {
-            background: #23385B;
-            color: #fff;
-            border: 1px solid #34568B;
-        }
-        .form-control::placeholder {
-            color: #b0c7e4;
-        }
-        .btn-primary {
-            background-color: #2D5DA5;
-            border: none;
-        }
-        .btn-primary:hover {
-            background-color: #1B4780;
-        }
+        .good { color: #2ecc71; }
+        .bad { color: #e74c3c; }
+        .other { color: #f1c40f; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2 class="text-center">اختبار الضغط على الموقع</h2>
-        
-        <div class="result-box">
-            <label>الرابط المستهدف:</label>
-            <input type="text" id="url" class="form-control" placeholder="https://example.com">
-
-            <label>طريقة الطلب:</label>
-            <select id="method" class="form-control">
-                <option value="GET">GET</option>
-                <option value="POST">POST</option>
-                <option value="MRB">MRB</option>
+        <h2>⚡ mrb DDoS  ⚡</h2>
+        <form id="checkForm">
+            <label>🔗 url :</label>
+            <input type="text" name="url" required placeholder="https://example.com">
+            
+            <label>⚙️ Attack method :</label>
+            <select name="check_type">
+                <option value="no_proxy">soc</option>
+                <option value="proxy">fake ip </option>
             </select>
+            
+            <label>porridge:</label>
+            <input type="number" name="num_threads" value="10" min="1">
+            
+            <button type="submit" class="button">🚀 start</button>
+        </form>
 
-            <div id="options">
-                <label>عدد الطلبات الكلي:</label>
-                <input type="number" id="total_requests" class="form-control" value="100">
-
-                <label>عدد الطلبات المتزامنة:</label>
-                <input type="number" id="concurrency" class="form-control" value="10">
-            </div>
-
-            <label>User-Agent (اختياري):</label>
-            <input type="text" id="user_agent" class="form-control" placeholder="Mozilla/5.0">
-
-            <label>البيانات المرسلة (JSON):</label>
-            <textarea id="payload" class="form-control" placeholder='{"key": "value"}'></textarea>
-
-            <button class="btn btn-primary w-100 mt-3" onclick="startTest()">بدء الاختبار</button>
-        </div>
-
-        <div class="mt-4 result-box">
-            <h5>النتائج:</h5>
-            <p><strong>الطلبات الناجحة:</strong> <span id="success">0</span></p>
-            <p><strong>الطلبات الفاشلة:</strong> <span id="failed">0</span></p>
-            <p id="status" class="text-danger"></p>
-        </div>
-
-        <div class="mt-4 result-box response-list">
-            <h5>تفاصيل الردود:</h5>
-            <ul id="response-list" class="list-group"></ul>
+        <div id="results" class="result-box">
+            <h3>📊 Results</h3>
+            <p><strong>Number of requests :</strong> <span id="total_requests">0</span></p>
+            <p class="good"><strong>✅ Successful  (200):</strong> <span id="success_count">0</span></p>
+            <p class="bad"><strong>❌ down (503):</strong> <span id="fail_count">0</span></p>
+            <p class="other"><strong>🟠 Other:</strong> <span id="other_count">0</span></p>
         </div>
     </div>
 
     <script>
-        function startTest() {
-            var url = document.getElementById("url").value.trim();
-            var method = document.getElementById("method").value;
-            var total_requests = parseInt(document.getElementById("total_requests").value);
-            var concurrency = parseInt(document.getElementById("concurrency").value);
-            var user_agent = document.getElementById("user_agent").value.trim();
-            var payload = method === "POST" ? document.getElementById("payload").value.trim() : null;
+        document.getElementById("checkForm").onsubmit = async function(event) {
+            event.preventDefault();
+            let formData = new FormData(event.target);
+            let response = await fetch("/check", { method: "POST", body: formData });
+            let result = await response.json();
 
-            if (!url) {
-                alert("يرجى إدخال رابط صحيح!");
-                return;
-            }
+            let total = result.length;
+            let success = result.filter(r => r.status === "GOOD").length;
+            let fail = result.filter(r => r.status === "BAD").length;
+            let other = total - (success + fail);
 
-            // تعطيل إدخال عدد الطلبات إذا كان MRB
-            if (method === "MRB") {
-                total_requests = 100;
-                concurrency = 1;
-            }
-
-            fetch("/start_test", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ url, total_requests, concurrency, method, user_agent, payload })
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("success").innerText = data.success;
-                document.getElementById("failed").innerText = data.failed;
-
-                var responseList = document.getElementById("response-list");
-                responseList.innerHTML = "";
-
-                data.results.forEach(result => {
-                    var item = `<li class="list-group-item text-dark">🔹 <b>${result.title}</b> | ${result.status_code} | ${result.server}</li>`;
-                    responseList.innerHTML += item;
-                });
-            })
-            .catch(error => {
-                console.error("خطأ أثناء إرسال الطلب:", error);
-                alert("حدث خطأ أثناء الاتصال بالخادم!");
-            });
-        }
-
-        // إخفاء خيارات العدد إذا كان MRB
-        document.getElementById("method").addEventListener("change", function() {
-            if (this.value === "MRB") {
-                document.getElementById("options").style.display = "none";
-            } else {
-                document.getElementById("options").style.display = "block";
-            }
-        });
+            document.getElementById("total_requests").innerText = total;
+            document.getElementById("success_count").innerText = success;
+            document.getElementById("fail_count").innerText = fail;
+            document.getElementById("other_count").innerText = other;
+        };
     </script>
 </body>
 </html>
