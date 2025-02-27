@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DDoS panel - dashboard</title>
+    <title>DDoS Panel - Dashboard</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -11,82 +11,133 @@
             color: white;
             text-align: center;
             padding: 20px;
+            margin: 0;
         }
         .container {
             width: 90%;
-            max-width: 600px;
+            max-width: 800px;
             margin: auto;
             background: #222;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.2);
+        }
+        h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #f39c12;
+        }
+        label {
+            display: block;
+            font-size: 18px;
+            margin: 15px 0 5px;
+            color: #f1c40f;
         }
         input, select, button {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin: 10px 0;
             font-size: 16px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
+            box-sizing: border-box;
         }
         input, select {
             background-color: #333;
             color: white;
         }
-        .button {
+        button {
             background-color: #f39c12;
             color: white;
             cursor: pointer;
             transition: 0.3s;
+            font-weight: bold;
         }
-        .button:hover {
+        button:hover {
             background-color: #e67e22;
         }
         .result-box {
             background-color: #333;
-            padding: 15px;
+            padding: 20px;
             margin-top: 20px;
             border-radius: 10px;
             text-align: left;
         }
+        .result-box h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: #f39c12;
+        }
         .stats {
-            margin-top: 20px;
+            margin-top: 15px;
             font-size: 18px;
             text-align: left;
             background: #444;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 15px;
+            border-radius: 8px;
         }
         .good { color: #2ecc71; }
         .bad { color: #e74c3c; }
         .other { color: #f1c40f; }
+        .attack-type {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .attack-type select {
+            flex: 1;
+        }
+        .attack-type input {
+            flex: 0.5;
+        }
+        @media (max-width: 600px) {
+            h2 {
+                font-size: 24px;
+            }
+            label {
+                font-size: 16px;
+            }
+            input, select, button {
+                font-size: 14px;
+                padding: 10px;
+            }
+            .result-box h3 {
+                font-size: 20px;
+            }
+            .stats {
+                font-size: 16px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>⚡ mrb DDoS  ⚡</h2>
+        <h2>⚡ MRB DDoS Panel ⚡</h2>
         <form id="checkForm">
-            <label>🔗 url :</label>
+            <label>🔗 URL:</label>
             <input type="text" name="url" required placeholder="https://example.com">
             
-            <label>⚙️ Attack method :</label>
-            <select name="check_type">
-                <option value="no_proxy">soc</option>
-                <option value="proxy">fake ip </option>
-            </select>
+            <label>⚙️ Attack Method:</label>
+            <div class="attack-type">
+                <select name="check_type">
+                    <option value="no_proxy">SOC</option>
+                    <option value="proxy">Fake IP</option>
+                    <option value="gsb">GSB</option>
+                </select>
+                <input type="number" name="num_threads" value="10" min="1" placeholder="Threads">
+            </div>
             
-            <label>porridge:</label>
-            <input type="number" name="num_threads" value="10" min="1">
-            
-            <button type="submit" class="button">🚀 start</button>
+            <button type="submit" class="button">🚀 Start Attack</button>
         </form>
 
         <div id="results" class="result-box">
             <h3>📊 Results</h3>
-            <p><strong>Number of requests :</strong> <span id="total_requests">0</span></p>
-            <p class="good"><strong>✅ Successful  (200):</strong> <span id="success_count">0</span></p>
-            <p class="bad"><strong>❌ down (503):</strong> <span id="fail_count">0</span></p>
-            <p class="other"><strong>🟠 Other:</strong> <span id="other_count">0</span></p>
+            <div class="stats">
+                <p><strong>Total Requests:</strong> <span id="total_requests">0</span></p>
+                <p class="good"><strong>✅ Successful (200):</strong> <span id="success_count">0</span></p>
+                <p class="bad"><strong>❌ Failed (503):</strong> <span id="fail_count">0</span></p>
+                <p class="other"><strong>🟠 Other:</strong> <span id="other_count">0</span></p>
+            </div>
         </div>
     </div>
 
