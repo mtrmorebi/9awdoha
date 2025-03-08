@@ -126,7 +126,7 @@ class RequestHandler:
 def home():
     return render_template("home.html")
 
-@app.route("/check", methods=["GET", "POST"])
+@app.route("/mrb260", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
         url = request.form.get("url")
