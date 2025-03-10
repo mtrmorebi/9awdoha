@@ -1,55 +1,215 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نيج ام كراش</title>
-    <link rel="stylesheet" href="mrb/my.css">
+    <title>DDoS panel</title>
     <style>
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background-color: #f0f0f0;
-            font-family: Arial, sans-serif;
+            font-family: 'Tajawal', sans-serif;
+            background: #121212; 
+            color: #ffffff; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        
+        header {
+            width: 100%;
+            background: rgba(32, 32, 32, 0.9);
+            padding: 1rem;
             text-align: center;
-            direction: rtl;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            position: fixed;
+            top: 0;
+            z-index: 1000;
         }
+
+        header h1 {
+            font-size: 1.8rem;
+            color: #007bff; 
+            margin: 0;
+        }
+
+        
         .container {
-            margin: 20px auto;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            width: 300px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            background: rgba(32, 32, 32, 0.6); 
+            padding: 2.5rem;
+            border-radius: 20px; 
+            backdrop-filter: blur(15px); 
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 1.5s ease-in-out;
+            margin-top: 6rem; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
         }
-        img {
-            width: 250px;
-            height: 250px;
-            margin: 15px 0;
-            border-radius: 10px;
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #007bff; 
+            animation: slideDown 0.8s ease-in-out;
         }
-        button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+            color: #e0e0e0; 
+            animation: slideUp 0.8s ease-in-out;
+        }
+
+        .features {
+            text-align: right;
+            margin-bottom: 2rem;
+        }
+
+        .features h3 {
+            font-size: 1.5rem;
+            color: #007bff; 
+            margin-bottom: 1rem;
+        }
+
+        .features ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .features ul li {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #e0e0e0; 
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.05); 
+            border-radius: 8px; 
+            transition: background 0.3s ease;
+        }
+
+        .features ul li:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .button {
+            padding: 0.75rem 1.5rem;
+            background: #007bff; 
+            color: #ffffff; 
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
             cursor: pointer;
-            margin-top: 15px;
-            transition: background-color 0.3s;
+            transition: background 0.3s ease, transform 0.2s ease;
+            text-decoration: none;
         }
-        button:hover {
-            background-color: #0056b3;
+
+        .button:hover {
+            background: #0056b3; 
+            transform: scale(1.05);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+                margin-top: 5rem;
+            }
+
+            h2 {
+                font-size: 1.8rem;
+            }
+
+            p {
+                font-size: 1rem;
+            }
+
+            .features h3 {
+                font-size: 1.3rem;
+            }
+
+            .features ul li {
+                font-size: 1rem;
+            }
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+
+    <header>
+        <h1>ddos panel </h1>
+    </header>
+
     <div class="container">
-        <p>ام كراش ممحونة تحتاج الي يبردها ب عيره</p>
-        
-        <img src="https://i.ibb.co/4g9cBXHQ/image.jpg" alt="كسم">
-        
-        <p>لي حجز ام كراش ب سعر رخيض جدا المرجو التواصل هنا </p>
-        <p>تخفيض حصري بسبب توسيع كسها من وراها ناكحها محمد </p>
-        <button onclick="window.location.href='https://t.me/I_2023'">تواصل معنا</button>
+        <h2>welcome to morebi ddos</h2>
+        <p>
+            Ultra DOS service is provided for free 
+          without using your resources provided by your uncle MOREBI
+        </p>
+
+        <div class="features">
+            <h3>what we offer:</h3>
+            <ul>
+                <li> acccurate statistics</li>
+                <li>no need to use your resources</li>
+                <li>fast requests</li>
+            </ul>
+        </div>
+        <div class="button-group">
+            <a href="/buy" class="button">start DDoS</a>
+            <a href="https://t.me/v_2jx" class="button">dm morebi</a>
+        </div>
     </div>
+
 </body>
 </html>
