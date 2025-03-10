@@ -130,7 +130,7 @@ class RequestHandler:
 @app.route("/", methods=["GET"])
 def home():
     return render_template("home.html")
-
+@app.route('/buy') def new_page():     return render_template('buy.html')
 @app.route("/mrb260", methods=["GET", "POST"])
 def index():
     global REQUESTS_SENT, BYTES_SEND
