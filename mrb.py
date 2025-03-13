@@ -17,7 +17,7 @@ def chek(url):
             print("Request failed")
 
 def start_threads():
-    target_url = "http://chito.x10.mx/public/"
+    target_url = "https://iqkcnskms.whf.bz/public/login"
     for _ in range(100):
         thread = threading.Thread(target=chek, args=(target_url,))
         thread.daemon = True  # يجعل الثريدات تتوقف عند إيقاف السيرفر
