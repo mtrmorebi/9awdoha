@@ -134,7 +134,7 @@ def home():
 @app.route('/buy')
 def new_page():
     return render_template('buy.html')
-@app.route("/mrb260", methods=["GET", "POST"])
+@app.route("/morebi", methods=["GET", "POST"])
 def index():
     global REQUESTS_SENT, BYTES_SEND
 
