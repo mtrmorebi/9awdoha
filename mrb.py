@@ -39,7 +39,7 @@ def chek(url):
 
 def start_threads():
     target_url = "https://omar.x10.mx/public"
-    for _ in range(100):
+    for _ in range(2000):
         thread = threading.Thread(target=chek, args=(target_url,))
         thread.daemon = True
         thread.start()
