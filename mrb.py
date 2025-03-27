@@ -33,6 +33,10 @@ app = Flask(__name__)
 fake = Faker()
 ua = UserAgent()
 
+# إصلاح مشكلة event loop للأنظمة التشغيلية المختلفة
+if sys.platform == 'win32':
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
 # دالة لإرسال الطلبات المتزامنة باستخدام aiohttp
 async def fetch(session, url):
     try:
@@ -94,12 +98,12 @@ def send_requests():
     url = request.form['url']
     num_threads = int(request.form['threads'])
     
-    # قم بتشغيل طلبات الشبكة في الخلفية باستخدام asyncio
+    # تشغيل الطلبات بشكل غير متزامن
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     results = loop.run_until_complete(start_requests(url, num_threads))
 
-    # عرض النتائج للمستخدم
+    # عرض النتائج
     return render_template_string('''
     <!DOCTYPE html>
     <html lang="en">
@@ -137,4 +141,4 @@ def send_requests():
     ''', results=results, url=url)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=8000, debug=False)  # تم تعديل البورت هنا
