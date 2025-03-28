@@ -3,3 +3,4 @@ requests
 Flask
 aiohttp
 user_agent
+fake_useragent 
