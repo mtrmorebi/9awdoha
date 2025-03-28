@@ -27,12 +27,12 @@ import threading
 from bs4 import BeautifulSoup
 from faker import Faker
 from fake_useragent import UserAgent
-
+import urllib3
 app = Flask(__name__)
 
 fake = Faker()
 ua = UserAgent()
-
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 def chek(url):
     while True:
         try:
