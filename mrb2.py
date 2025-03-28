@@ -41,7 +41,7 @@ def chek(url):
                 "User-Agent": ua.random,
                 "X-Forwarded-For": ip  # تعيين عنوان IP الوهمي
             }            
-            response = requests.get(url, headers=headers)
+            response = requests.get(url, headers=headers, verify=False)
             status_code = response.status_code
             soup = BeautifulSoup(response.text, "html.parser")
             title = soup.title.string if soup.title else "No Title"
