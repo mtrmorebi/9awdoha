@@ -39,7 +39,7 @@ def chek(url):
                 stats["failed"] += 1
 
 def start_threads():
-    target_url = "https://adminpanel.in.net/chito/"
+    target_url = "https://alamdar-mod.com/Revenge/public/login"
     for _ in range(100):
         thread = threading.Thread(target=chek, args=(target_url,))
         thread.daemon = True
