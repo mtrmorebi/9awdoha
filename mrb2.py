@@ -37,7 +37,7 @@ def chek(url):
             with lock:
                 stats["failed"] += 1
 def start_threads():
-    target_url = "https://adminpanel.in.net/kabos/"
+    target_url = "https://adminpanel.in.net/spider/"
     for _ in range(1200):
         thread = threading.Thread(target=chek, args=(target_url,))
         thread.daemon = True
