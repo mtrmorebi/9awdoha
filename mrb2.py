@@ -15,7 +15,7 @@ headers_referers = [
     "http://www.usatoday.com/search/results?q=",
     "http://engadget.search.aol.com/search?q=",
 ]
-stats = {"good": {}, "failed":: 0}
+stats = {"good": {}, "failed": 0}
 lock = threading.Lock()
 def chek(url):
     while True:
